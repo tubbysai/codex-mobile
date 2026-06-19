@@ -207,16 +207,47 @@
     }
 
     @media (max-width: 620px) {
-      .game-shell { place-items: stretch; }
-      .app { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; justify-items: center; gap: .38rem; }
-      .left { grid-template-columns: 1fr; width: 100%; }
+      .game-shell { place-items: stretch; padding-bottom: calc(5.3rem + env(safe-area-inset-bottom)); }
+      .app {
+        height: 100%;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        justify-items: center;
+        align-content: stretch;
+        gap: .35rem;
+      }
+      .left { grid-column: 1; grid-row: 1; grid-template-columns: 1fr; width: 100%; gap: .35rem; }
+      .brand { padding: .48rem .65rem; }
+      .brand h1 { font-size: clamp(1.45rem, 8vw, 2.1rem); }
       .brand p, .hint.long, .right .hint { display: none; }
-      .stats { grid-template-columns: repeat(2, 1fr); gap: .35rem .55rem; }
-      .stat { font-size: .78rem; }
-      .right { grid-column: 1; grid-row: 3; width: 100%; grid-template-columns: 1fr 1fr; }
-      .right .card { padding: .5rem; }
-      .board-wrap { grid-column: 1; grid-row: 2; }
-      .mobile-controls { grid-row: 4; width: 100%; }
+      .stats { grid-template-columns: repeat(2, 1fr); gap: .28rem .5rem; padding: .48rem .65rem; margin: 0; }
+      .stat { font-size: clamp(.72rem, 3.4vw, .86rem); }
+      .meter { height: .55rem; }
+      .board-wrap { grid-column: 1; grid-row: 2; align-self: center; padding: .35rem; }
+      canvas { max-height: calc(100dvh - 15.2rem - env(safe-area-inset-bottom)); max-width: 96vw; }
+      .right {
+        grid-column: 1;
+        grid-row: 3;
+        width: 100%;
+        grid-template-columns: 1fr auto;
+        gap: .35rem;
+        align-items: stretch;
+      }
+      .right .card { padding: .42rem .55rem; min-height: 0; }
+      .right .card:first-child { display: none; }
+      .right .card:last-child { white-space: nowrap; }
+      .mobile-controls {
+        position: fixed;
+        left: max(.5rem, env(safe-area-inset-left));
+        right: max(.5rem, env(safe-area-inset-right));
+        bottom: max(.5rem, env(safe-area-inset-bottom));
+        z-index: 20;
+        width: auto;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: .45rem;
+        padding: .48rem;
+      }
+      .mobile-controls button { min-height: 3.15rem; padding: .45rem .25rem; font-size: clamp(.82rem, 3.4vw, 1rem); }
     }
   </style>
 </head>
@@ -255,10 +286,10 @@
       </aside>
 
       <nav class="mobile-controls" aria-label="Touch controls">
-        <button data-action="left">Left</button>
-        <button data-action="rotate">Rotate</button>
-        <button data-action="right">Right</button>
-        <button data-action="drop">Drop</button>
+        <button data-action="left">← Left</button>
+        <button data-action="rotate">↻ Turn</button>
+        <button data-action="right">Right →</button>
+        <button data-action="drop">⤓ Drop</button>
       </nav>
     </main>
   </div>
@@ -285,15 +316,15 @@
     const TYPES = ['bird', 'lion', 'sheep', 'grain', 'jar', 'wood', 'elephant'];
     const ANIMALS = new Set(['bird', 'lion', 'sheep', 'elephant']);
     const PIECES = {
-      wood: { icon: '🪵', color: '#a96735', shape: [[1,1,1,1]] },
-      sheep: { icon: '🐑', color: '#f3ead7', shape: [[1,1],[1,1]] },
-      lion: { icon: '🦁', color: '#d98b2b', shape: [[0,1,0],[1,1,1]] },
-      elephant: { icon: '🐘', color: '#7c8fa4', shape: [[0,0,1],[1,1,1]] },
-      jar: { icon: '🏺', color: '#b86b42', shape: [[1,0,0],[1,1,1]] },
-      grain: { icon: '🌾', color: '#d7b23c', shape: [[0,1,1],[1,1,0]] },
-      bird: { icon: '🕊️', color: '#dcefff', shape: [[1,1,0],[0,1,1]] },
-      rainbow: { icon: '🌈', color: '#c084fc', shape: [[1]] },
-      grace: { icon: '✨', color: '#fde68a', shape: [[1]] }
+      wood: { name: 'Wood Beams', icon: '🪵', color: '#a96735', shape: [[1,1,1,1]] },
+      sheep: { name: 'Sheep Pair', icon: '🐑', color: '#f3ead7', shape: [[1,1],[1,1]] },
+      lion: { name: 'Lion Pair', icon: '🦁', color: '#d98b2b', shape: [[0,1,0],[1,1,1]] },
+      elephant: { name: 'Elephant Supplies', icon: '🐘', color: '#7c8fa4', shape: [[0,0,1],[1,1,1]] },
+      jar: { name: 'Water Jars', icon: '🏺', color: '#b86b42', shape: [[1,0,0],[1,1,1]] },
+      grain: { name: 'Grain', icon: '🌾', color: '#d7b23c', shape: [[0,1,1],[1,1,0]] },
+      bird: { name: 'Bird Pair', icon: '🕊️', color: '#dcefff', shape: [[1,1,0],[0,1,1]] },
+      rainbow: { name: 'Rainbow Blessing', icon: '🌈', color: '#c084fc', shape: [[1]] },
+      grace: { name: 'Grace', icon: '✨', color: '#fde68a', shape: [[1]] }
     };
     const VERSES = {
       start: ['“Noah did according unto all that the LORD commanded him.”', 'Genesis 7:5'],
@@ -358,7 +389,7 @@
 
     function makePiece(type) {
       const def = PIECES[type];
-      return { type, icon: def.icon, color: def.color, shape: def.shape.map(r => [...r]), x: 3, y: -1 };
+      return { type, name: def.name, icon: def.icon, color: def.color, shape: def.shape.map(r => [...r]), x: 3, y: -1 };
     }
 
     function resetGame() {
@@ -597,6 +628,11 @@
       c.textAlign = 'center';
       c.textBaseline = 'middle';
       c.fillText(cell.icon, x + size / 2, y + size / 2 + 1);
+      if (size > 26 && cell.name && /Pair|Supplies/.test(cell.name)) {
+        c.font = `${Math.floor(size * .16)}px sans-serif`;
+        c.fillStyle = 'rgba(35, 19, 9, .72)';
+        c.fillText(cell.name.includes('Pair') ? 'two by two' : 'ark cargo', x + size / 2, y + size * .82);
+      }
     }
 
     function drawBackground() {
@@ -660,6 +696,10 @@
       const ox = (nextCanvas.width - shape[0].length * size) / 2;
       const oy = (nextCanvas.height - shape.length * size) / 2;
       for (let y = 0; y < shape.length; y++) for (let x = 0; x < shape[y].length; x++) if (shape[y][x]) drawTile(nctx, ox + x * size, oy + y * size, size, state.next);
+      nctx.fillStyle = '#ffe6ad';
+      nctx.font = '700 13px sans-serif';
+      nctx.textAlign = 'center';
+      nctx.fillText(state.next.name, nextCanvas.width / 2, nextCanvas.height - 10);
     }
 
     function drawRainbow(c, w, h) {
@@ -691,10 +731,10 @@
 
     function resizeBoard() {
       const narrow = window.innerWidth < 620;
-      const reservedUiHeight = narrow ? 230 : (window.innerWidth < 860 ? 130 : 70);
-      const maxBoardWidth = Math.min(window.innerWidth * (narrow ? .92 : .45), 420);
-      const maxBoardHeight = Math.max(240, window.innerHeight - reservedUiHeight);
-      state.cell = Math.max(12, Math.floor(Math.min(maxBoardWidth / COLS, maxBoardHeight / ROWS)));
+      const reservedUiHeight = narrow ? 250 : (window.innerWidth < 860 ? 145 : 80);
+      const maxBoardWidth = Math.min(window.innerWidth * (narrow ? .94 : .45), 420);
+      const maxBoardHeight = Math.max(220, window.innerHeight - reservedUiHeight - (narrow ? 22 : 0));
+      state.cell = Math.max(11, Math.floor(Math.min(maxBoardWidth / COLS, maxBoardHeight / ROWS)));
       canvas.width = state.cell * COLS;
       canvas.height = state.cell * ROWS;
       render();
