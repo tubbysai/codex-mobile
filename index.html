@@ -2,212 +2,734 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Codex Catcher</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Noah’s Ark</title>
   <style>
     :root {
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #f8fafc;
-      background: #020617;
+      --wood: #9a5f2f;
+      --wood-dark: #4b2c18;
+      --gold: #f7c873;
+      --panel: rgba(43, 30, 22, 0.82);
+      --storm: #0b1d34;
+      --cream: #fff3d5;
+      --blue: #5ec8ff;
+      font-family: ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--cream);
     }
 
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--storm);
     }
 
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 1rem;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.35), transparent 22rem),
-        radial-gradient(circle at 80% 10%, rgba(168, 85, 247, 0.25), transparent 20rem),
-        #020617;
-      touch-action: manipulation;
+      min-height: 100dvh;
+      touch-action: none;
       user-select: none;
     }
 
-    .game {
-      width: min(100%, 28rem);
-      border: 1px solid rgba(148, 163, 184, 0.28);
-      border-radius: 1.5rem;
-      overflow: hidden;
-      background: rgba(15, 23, 42, 0.9);
-      box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.45);
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 1rem;
-      background: rgba(15, 23, 42, 0.78);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(1.5rem, 6vw, 2.25rem);
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(2, auto);
-      gap: 0.35rem 0.75rem;
-      color: #cbd5e1;
-      font-size: 0.9rem;
-      text-align: right;
-    }
-
-    .stat-value {
-      color: #f8fafc;
-      font-weight: 700;
-    }
-
-    .arena {
-      position: relative;
-      height: 28rem;
-      max-height: 68vh;
-      min-height: 22rem;
-      background:
-        linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(14, 165, 233, 0.12) 1px, transparent 1px),
-        rgba(2, 6, 23, 0.82);
-      background-size: 2rem 2rem;
-      cursor: crosshair;
-    }
-
-    .target {
-      position: absolute;
-      width: 4.5rem;
-      aspect-ratio: 1;
+    button {
       border: 0;
       border-radius: 999px;
-      color: #082f49;
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #67e8f9, #facc15);
-      box-shadow: 0 0 2rem rgba(103, 232, 249, 0.45);
-      transform: translate(-50%, -50%) scale(1);
-      transition: transform 120ms ease, filter 120ms ease;
-    }
-
-    .target:active {
-      transform: translate(-50%, -50%) scale(0.92);
-      filter: brightness(1.15);
-    }
-
-    .panel {
-      padding: 1rem;
-      display: grid;
-      gap: 0.8rem;
-      background: rgba(15, 23, 42, 0.92);
-    }
-
-    .message {
-      margin: 0;
-      color: #cbd5e1;
-      line-height: 1.5;
-    }
-
-    .start {
-      border: 0;
-      border-radius: 999px;
-      padding: 0.9rem 1rem;
-      color: #082f49;
-      background: linear-gradient(135deg, #22d3ee, #bef264);
-      font-size: 1rem;
-      font-weight: 800;
+      min-height: 44px;
+      padding: 0.65rem 0.9rem;
+      color: #2b170b;
+      background: linear-gradient(180deg, #ffe5a6, #d38d32);
+      box-shadow: inset 0 2px rgba(255,255,255,.55), 0 8px 18px rgba(0,0,0,.28);
+      font-weight: 900;
       cursor: pointer;
+    }
+
+    .game-shell {
+      width: 100vw;
+      height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: max(.5rem, env(safe-area-inset-top)) max(.5rem, env(safe-area-inset-right))
+               max(.5rem, env(safe-area-inset-bottom)) max(.5rem, env(safe-area-inset-left));
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 221, 130, .16), transparent 18rem),
+        radial-gradient(circle at 80% 5%, rgba(88, 176, 255, .26), transparent 20rem),
+        linear-gradient(180deg, #122f55 0%, #081427 62%, #06111f 100%);
+    }
+
+    .app {
+      width: min(100%, 1180px);
+      height: min(100%, 780px);
+      display: grid;
+      grid-template-columns: minmax(178px, .78fr) auto minmax(190px, .88fr);
+      gap: clamp(.45rem, 1.2vw, 1rem);
+      align-items: center;
+    }
+
+    .card, .board-wrap, .mobile-controls {
+      border: 1px solid rgba(255, 219, 152, .28);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(132, 79, 37, .28), transparent 36%),
+        var(--panel);
+      box-shadow: 0 18px 42px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.12);
+      backdrop-filter: blur(8px);
+    }
+
+    .card { padding: clamp(.65rem, 1.4vw, 1rem); }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 4vw, 3rem);
+      line-height: 1;
+      letter-spacing: .02em;
+      color: #ffe6ad;
+      text-shadow: 0 3px #3c210e;
+    }
+
+    .brand p, .hint, .verse-ref { color: #f7d9a5; }
+    .brand p { margin: .45rem 0 0; font-size: clamp(.78rem, 1.3vw, 1rem); }
+
+    .stats { display: grid; gap: .65rem; margin-top: .85rem; }
+    .stat { display: flex; justify-content: space-between; gap: .7rem; font-size: clamp(.82rem, 1.3vw, 1rem); }
+    .value { color: #fff6d9; font-weight: 900; }
+
+    .meter {
+      height: .82rem;
+      border-radius: 99px;
+      overflow: hidden;
+      background: rgba(8, 20, 39, .8);
+      border: 1px solid rgba(255,255,255,.16);
+    }
+
+    .meter > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #48d4ff, #2476d8 70%, #123d95);
+      transition: width 280ms ease;
+    }
+
+    .board-wrap {
+      position: relative;
+      padding: clamp(.45rem, 1.2vw, .8rem);
+      justify-self: center;
+      background:
+        linear-gradient(90deg, rgba(85,46,20,.95), rgba(173,102,44,.95), rgba(82,45,22,.95));
+    }
+
+    .board-wrap.rainbow { box-shadow: 0 0 34px rgba(255, 239, 120, .75), 0 18px 42px rgba(0,0,0,.34); }
+
+    canvas {
+      display: block;
+      max-width: 90vw;
+      max-height: 72dvh;
+      border-radius: 16px;
+      background: #081427;
+      box-shadow: inset 0 0 0 4px rgba(63,35,16,.95), inset 0 0 30px rgba(0,0,0,.65);
+    }
+
+    .side { display: grid; gap: .75rem; }
+    .next-canvas { width: 100%; max-width: 160px; height: auto; border-radius: 16px; background: rgba(5,15,31,.78); }
+    .phase { color: #ffe6ad; font-weight: 900; }
+    .hint { font-size: clamp(.72rem, 1.2vw, .88rem); line-height: 1.4; }
+
+    .mobile-controls {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(58px, 1fr));
+      gap: .45rem;
+      padding: .55rem;
+    }
+
+    .overlay, .verse-card, .float-msg {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-align: center;
+    }
+
+    .overlay {
+      width: min(92vw, 520px);
+      padding: clamp(1rem, 4vw, 2rem);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 222, 161, .38);
+      background: linear-gradient(180deg, rgba(66,42,25,.96), rgba(20,31,46,.96));
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+    }
+
+    .overlay h2 { margin: 0 0 .5rem; font-size: clamp(2rem, 8vw, 4rem); color: #ffe6ad; }
+    .overlay p { margin: .4rem 0; color: #f7d9a5; }
+    .hidden { display: none !important; }
+
+    .verse-card {
+      top: 18%;
+      width: min(88vw, 460px);
+      padding: .95rem 1.1rem;
+      border-radius: 20px;
+      color: #fff3d5;
+      background: rgba(38, 26, 18, .9);
+      border: 1px solid rgba(255, 222, 161, .35);
+      box-shadow: 0 18px 46px rgba(0,0,0,.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .45s ease, transform .45s ease;
+    }
+
+    .verse-card.show { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+    .verse-text { margin: 0 0 .35rem; font-size: clamp(.95rem, 2vw, 1.15rem); }
+    .verse-ref { margin: 0; font-weight: 800; }
+
+    .float-msg {
+      top: 30%;
+      color: #fff8cf;
+      font-size: clamp(1.1rem, 4vw, 2rem);
+      font-weight: 1000;
+      text-shadow: 0 4px 16px #000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease, transform .22s ease;
+    }
+
+    .float-msg.show { opacity: 1; transform: translate(-50%, -75%); }
+
+    @media (max-width: 860px) {
+      .app { height: 100%; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto; align-content: center; }
+      .left { grid-column: 1 / -1; display: grid; grid-template-columns: 1.2fr 1fr; gap: .5rem; align-items: center; }
+      .left .stats { margin: 0; }
+      .board-wrap { grid-column: 1; grid-row: 2; }
+      .right { grid-column: 2; grid-row: 2; align-self: stretch; align-content: start; }
+      .hint.long { display: none; }
+    }
+
+    @media (max-width: 620px) {
+      .game-shell { place-items: stretch; }
+      .app { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; justify-items: center; gap: .38rem; }
+      .left { grid-template-columns: 1fr; width: 100%; }
+      .brand p, .hint.long, .right .hint { display: none; }
+      .stats { grid-template-columns: repeat(2, 1fr); gap: .35rem .55rem; }
+      .stat { font-size: .78rem; }
+      .right { grid-column: 1; grid-row: 3; width: 100%; grid-template-columns: 1fr 1fr; }
+      .right .card { padding: .5rem; }
+      .board-wrap { grid-column: 1; grid-row: 2; }
+      .mobile-controls { grid-row: 4; width: 100%; }
     }
   </style>
 </head>
 <body>
-  <main class="game" aria-labelledby="game-title">
-    <section class="header">
-      <h1 id="game-title">Codex Catcher</h1>
-      <div class="stats" aria-live="polite">
-        <span>Score</span><span class="stat-value" id="score">0</span>
-        <span>Time</span><span class="stat-value"><span id="time">30</span>s</span>
-      </div>
-    </section>
+  <div class="game-shell">
+    <main class="app" aria-label="Noah's Ark game">
+      <aside class="side left">
+        <section class="card brand">
+          <h1>Noah’s Ark</h1>
+          <p>Load the ark. Survive the flood. Reach the rainbow.</p>
+        </section>
+        <section class="card stats" aria-live="polite">
+          <div class="stat"><span>Score</span><span class="value" id="score">0</span></div>
+          <div class="stat"><span>Day</span><span class="value" id="day">1 / 40</span></div>
+          <div class="stat"><span>Phase</span><span class="value phase" id="phase">Build the Ark</span></div>
+          <div><div class="stat"><span>Flood</span><span class="value" id="floodText">0%</span></div><div class="meter"><span id="floodFill"></span></div></div>
+        </section>
+      </aside>
 
-    <section class="arena" id="arena" aria-label="Game area">
-      <button class="target" id="target" type="button" aria-label="Catch the target">★</button>
-    </section>
+      <section class="board-wrap" id="boardWrap">
+        <canvas id="board" width="300" height="600" aria-label="10 by 20 ark cargo board"></canvas>
+      </section>
 
-    <section class="panel">
-      <p class="message" id="message">Tap Start, then catch as many stars as you can before time runs out.</p>
-      <button class="start" id="start" type="button">Start Game</button>
-    </section>
-  </main>
+      <aside class="side right">
+        <section class="card">
+          <strong>Next Cargo</strong>
+          <canvas class="next-canvas" id="next" width="160" height="120" aria-label="Next cargo preview"></canvas>
+        </section>
+        <section class="card hint long">
+          <strong>Controls</strong><br>
+          ←/→ Move · ↑ Rotate · ↓ Soft Drop<br>
+          Space Drop · P Pause · R Restart
+        </section>
+        <section class="card hint" id="feedback">Press Start to load the ark.</section>
+        <section class="card"><button id="startBtn">Start</button> <button id="pauseBtn">Pause</button></section>
+      </aside>
+
+      <nav class="mobile-controls" aria-label="Touch controls">
+        <button data-action="left">Left</button>
+        <button data-action="rotate">Rotate</button>
+        <button data-action="right">Right</button>
+        <button data-action="drop">Drop</button>
+      </nav>
+    </main>
+  </div>
+
+  <section class="overlay" id="overlay">
+    <h2 id="overlayTitle">Noah’s Ark</h2>
+    <p id="overlayText">Load the ark. Survive the flood. Reach the rainbow.</p>
+    <p class="verse-text">“Noah did according unto all that the LORD commanded him.”</p>
+    <p class="verse-ref">Genesis 7:5</p>
+    <button id="overlayButton">Press Start</button>
+  </section>
+
+  <section class="verse-card" id="verseCard">
+    <p class="verse-text" id="verseText"></p>
+    <p class="verse-ref" id="verseRef"></p>
+  </section>
+  <div class="float-msg" id="floatMsg"></div>
 
   <script>
-    const arena = document.querySelector('#arena');
-    const target = document.querySelector('#target');
-    const scoreLabel = document.querySelector('#score');
-    const timeLabel = document.querySelector('#time');
-    const message = document.querySelector('#message');
-    const startButton = document.querySelector('#start');
+    'use strict';
 
-    let score = 0;
-    let timeLeft = 30;
-    let timerId;
-    let playing = false;
+    const COLS = 10;
+    const ROWS = 20;
+    const TYPES = ['bird', 'lion', 'sheep', 'grain', 'jar', 'wood', 'elephant'];
+    const ANIMALS = new Set(['bird', 'lion', 'sheep', 'elephant']);
+    const PIECES = {
+      wood: { icon: '🪵', color: '#a96735', shape: [[1,1,1,1]] },
+      sheep: { icon: '🐑', color: '#f3ead7', shape: [[1,1],[1,1]] },
+      lion: { icon: '🦁', color: '#d98b2b', shape: [[0,1,0],[1,1,1]] },
+      elephant: { icon: '🐘', color: '#7c8fa4', shape: [[0,0,1],[1,1,1]] },
+      jar: { icon: '🏺', color: '#b86b42', shape: [[1,0,0],[1,1,1]] },
+      grain: { icon: '🌾', color: '#d7b23c', shape: [[0,1,1],[1,1,0]] },
+      bird: { icon: '🕊️', color: '#dcefff', shape: [[1,1,0],[0,1,1]] },
+      rainbow: { icon: '🌈', color: '#c084fc', shape: [[1]] },
+      grace: { icon: '✨', color: '#fde68a', shape: [[1]] }
+    };
+    const VERSES = {
+      start: ['“Noah did according unto all that the LORD commanded him.”', 'Genesis 7:5'],
+      build: ['“Make thee an ark of gopher wood.”', 'Genesis 6:14'],
+      animals: ['“Two and two went in unto Noah into the ark.”', 'Genesis 7:9'],
+      rain: ['“The rain was upon the earth forty days and forty nights.”', 'Genesis 7:12'],
+      victory: ['“I do set my bow in the cloud.”', 'Genesis 9:13']
+    };
 
-    function moveTarget() {
-      const padding = target.offsetWidth / 2 + 8;
-      const maxX = arena.clientWidth - padding;
-      const maxY = arena.clientHeight - padding;
-      const x = Math.random() * (maxX - padding) + padding;
-      const y = Math.random() * (maxY - padding) + padding;
+    const canvas = document.querySelector('#board');
+    const ctx = canvas.getContext('2d');
+    const nextCanvas = document.querySelector('#next');
+    const nctx = nextCanvas.getContext('2d');
+    const boardWrap = document.querySelector('#boardWrap');
+    const overlay = document.querySelector('#overlay');
+    const overlayTitle = document.querySelector('#overlayTitle');
+    const overlayText = document.querySelector('#overlayText');
+    const overlayButton = document.querySelector('#overlayButton');
+    const startBtn = document.querySelector('#startBtn');
+    const pauseBtn = document.querySelector('#pauseBtn');
+    const scoreEl = document.querySelector('#score');
+    const dayEl = document.querySelector('#day');
+    const phaseEl = document.querySelector('#phase');
+    const floodFill = document.querySelector('#floodFill');
+    const floodText = document.querySelector('#floodText');
+    const feedback = document.querySelector('#feedback');
+    const verseCard = document.querySelector('#verseCard');
+    const verseText = document.querySelector('#verseText');
+    const verseRef = document.querySelector('#verseRef');
+    const floatMsg = document.querySelector('#floatMsg');
 
-      target.style.left = `${x}px`;
-      target.style.top = `${y}px`;
+    const state = {
+      board: emptyBoard(), bag: [], current: null, next: null,
+      score: 0, day: 1, dayProgress: 0, flood: 0,
+      running: false, paused: false, over: false, won: false,
+      lastTime: 0, dropTimer: 0, cell: 30, rain: [], flashes: [],
+      rainbowUntil: 0, shown: {}, startedAt: 0
+    };
+
+    function emptyBoard() {
+      return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
     }
 
-    function endGame() {
-      playing = false;
-      clearInterval(timerId);
-      startButton.disabled = false;
-      startButton.textContent = 'Play Again';
-      message.textContent = `Game over! You caught ${score} ${score === 1 ? 'star' : 'stars'}.`;
-    }
-
-    function startGame() {
-      score = 0;
-      timeLeft = 30;
-      playing = true;
-      scoreLabel.textContent = score;
-      timeLabel.textContent = timeLeft;
-      message.textContent = 'Go! Tap each star as quickly as you can.';
-      startButton.disabled = true;
-      moveTarget();
-
-      timerId = setInterval(() => {
-        timeLeft -= 1;
-        timeLabel.textContent = timeLeft;
-
-        if (timeLeft <= 0) {
-          endGame();
-        }
-      }, 1000);
-    }
-
-    target.addEventListener('click', () => {
-      if (!playing) {
-        return;
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
       }
+      return array;
+    }
 
-      score += 1;
-      scoreLabel.textContent = score;
-      moveTarget();
+    function refillBag() {
+      state.bag = shuffle([...TYPES]);
+      if (Math.random() < 0.12) state.bag.splice(Math.floor(Math.random() * state.bag.length), 0, 'rainbow');
+      if (Math.random() < 0.10) state.bag.splice(Math.floor(Math.random() * state.bag.length), 0, 'grace');
+    }
+
+    function drawType() {
+      if (!state.bag.length) refillBag();
+      return state.bag.pop();
+    }
+
+    function makePiece(type) {
+      const def = PIECES[type];
+      return { type, icon: def.icon, color: def.color, shape: def.shape.map(r => [...r]), x: 3, y: -1 };
+    }
+
+    function resetGame() {
+      state.board = emptyBoard();
+      state.bag = [];
+      state.current = makePiece(drawType());
+      state.next = makePiece(drawType());
+      state.score = 0;
+      state.day = 1;
+      state.dayProgress = 0;
+      state.flood = 0;
+      state.running = true;
+      state.paused = false;
+      state.over = false;
+      state.won = false;
+      state.dropTimer = 0;
+      state.lastTime = performance.now();
+      state.flashes = [];
+      state.rainbowUntil = 0;
+      state.shown = {};
+      state.startedAt = performance.now();
+      overlay.classList.add('hidden');
+      showVerse('build');
+      updateUi();
+      requestAnimationFrame(loop);
+    }
+
+    function phaseForDay(day) {
+      if (day >= 40) return 'Covenant Rainbow';
+      if (day >= 31) return 'Forty Days';
+      if (day >= 15) return 'The Rain Begins';
+      if (day >= 8) return 'Gather the Animals';
+      return 'Build the Ark';
+    }
+
+    function dropInterval() {
+      const base = 920 - state.day * 15;
+      const blessing = performance.now() < state.rainbowUntil ? 1.8 : 1;
+      return Math.max(130, base) * blessing;
+    }
+
+    function collides(piece, ox = 0, oy = 0, shape = piece.shape) {
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (!shape[y][x]) continue;
+          const bx = piece.x + x + ox;
+          const by = piece.y + y + oy;
+          if (bx < 0 || bx >= COLS || by >= ROWS) return true;
+          if (by >= 0 && state.board[by][bx]) return true;
+        }
+      }
+      return false;
+    }
+
+    function rotateShape(shape) {
+      return shape[0].map((_, i) => shape.map(row => row[i]).reverse());
+    }
+
+    function move(dx) {
+      if (!canAct()) return;
+      if (!collides(state.current, dx, 0)) state.current.x += dx;
+    }
+
+    function rotate() {
+      if (!canAct()) return;
+      const rotated = rotateShape(state.current.shape);
+      if (!collides(state.current, 0, 0, rotated)) state.current.shape = rotated;
+      else if (!collides(state.current, -1, 0, rotated)) { state.current.x--; state.current.shape = rotated; }
+      else if (!collides(state.current, 1, 0, rotated)) { state.current.x++; state.current.shape = rotated; }
+    }
+
+    function softDrop() {
+      if (!canAct()) return;
+      if (!collides(state.current, 0, 1)) {
+        state.current.y++;
+        state.score += 1;
+      } else lockPiece();
+    }
+
+    function hardDrop() {
+      if (!canAct()) return;
+      let cells = 0;
+      while (!collides(state.current, 0, 1)) { state.current.y++; cells++; }
+      state.score += cells * 2;
+      lockPiece();
+    }
+
+    function lockPiece() {
+      const piece = state.current;
+      let landedAnimal = ANIMALS.has(piece.type);
+      if (piece.type === 'rainbow') return rainbowBlessing();
+      if (piece.type === 'grace') return gracePower();
+
+      for (let y = 0; y < piece.shape.length; y++) {
+        for (let x = 0; x < piece.shape[y].length; x++) {
+          if (!piece.shape[y][x]) continue;
+          const by = piece.y + y;
+          const bx = piece.x + x;
+          if (by < 0) return gameOver();
+          state.board[by][bx] = { type: piece.type, icon: piece.icon, color: piece.color, animal: landedAnimal };
+        }
+      }
+      if (landedAnimal && Math.random() < .42) toast(Math.random() < .5 ? 'Two by Two!' : 'Animals secured!');
+      clearRows();
+      spawnNext();
+    }
+
+    function spawnNext() {
+      state.current = state.next;
+      state.current.x = 3;
+      state.current.y = -1;
+      state.next = makePiece(drawType());
+      if (collides(state.current, 0, 0)) gameOver();
+    }
+
+    function clearRows() {
+      const full = [];
+      for (let y = 0; y < ROWS; y++) if (state.board[y].every(Boolean)) full.push(y);
+      if (!full.length) return;
+      const animalBonus = full.some(y => state.board[y].some(cell => cell && cell.animal));
+      state.flashes = full.map(y => ({ y, t: 220 }));
+      for (const y of full) {
+        state.board.splice(y, 1);
+        state.board.unshift(Array(COLS).fill(null));
+      }
+      const table = [0, 100, 300, 500, 800];
+      state.score += table[full.length] || full.length * 250;
+      state.dayProgress += full.length * 28;
+      state.flood = Math.max(0, state.flood - full.length * 4);
+      if (animalBonus) { state.score += 40; toast('Two by Two bonus!'); }
+      else toast(full.length > 1 ? 'Provision combo!' : 'Provision stored!');
+      advanceDays();
+    }
+
+    function rainbowBlessing() {
+      state.score += 120;
+      state.rainbowUntil = performance.now() + 6500;
+      state.flood = Math.max(0, state.flood - 14);
+      boardWrap.classList.add('rainbow');
+      setTimeout(() => boardWrap.classList.remove('rainbow'), 6500);
+      toast('Rainbow Blessing!');
+      spawnNext();
+    }
+
+    function gracePower() {
+      state.score += 100;
+      for (let y = ROWS - 1; y >= 0; y--) {
+        if (state.board[y].some(Boolean)) { state.board.splice(y, 1); state.board.unshift(Array(COLS).fill(null)); break; }
+      }
+      state.flood = Math.max(0, state.flood - 8);
+      toast('Grace!');
+      spawnNext();
+    }
+
+    function advanceDays() {
+      while (state.dayProgress >= 100 && state.day < 40) {
+        state.dayProgress -= 100;
+        state.day += 1;
+        state.score += 25;
+        const phase = phaseForDay(state.day);
+        if (state.day === 8) showVerse('animals');
+        if (state.day === 15) showVerse('rain');
+        if (state.day >= 40) return victory();
+        feedback.textContent = phase;
+      }
+    }
+
+    function canAct() { return state.running && !state.paused && !state.over && !state.won; }
+
+    function togglePause() {
+      if (!state.running || state.over || state.won) return;
+      state.paused = !state.paused;
+      if (state.paused) showOverlay('Paused', 'Press P to continue', 'Resume');
+      else { overlay.classList.add('hidden'); state.lastTime = performance.now(); requestAnimationFrame(loop); }
+    }
+
+    function gameOver() {
+      state.over = true; state.running = false;
+      showOverlay('The ark overflowed.', `Day reached: ${state.day} / 40 · Score: ${state.score}`, 'Restart');
+    }
+
+    function victory() {
+      state.won = true; state.running = false; state.day = 40; state.flood = 0;
+      showVerse('victory', 5200);
+      showOverlay('The rainbow appears.', `You survived 40 days. Score: ${state.score}`, 'Restart');
+    }
+
+    function showOverlay(title, text, button) {
+      overlayTitle.textContent = title;
+      overlayText.textContent = text;
+      overlayButton.textContent = button;
+      overlay.classList.remove('hidden');
+    }
+
+    function showVerse(key, duration = 3600) {
+      if (state.shown[key]) return;
+      state.shown[key] = true;
+      verseText.textContent = VERSES[key][0];
+      verseRef.textContent = VERSES[key][1];
+      verseCard.classList.add('show');
+      setTimeout(() => verseCard.classList.remove('show'), duration);
+    }
+
+    function toast(text) {
+      feedback.textContent = text;
+      floatMsg.textContent = text;
+      floatMsg.classList.add('show');
+      setTimeout(() => floatMsg.classList.remove('show'), 900);
+    }
+
+    function updateUi() {
+      scoreEl.textContent = state.score;
+      dayEl.textContent = `${state.day} / 40`;
+      phaseEl.textContent = phaseForDay(state.day);
+      floodText.textContent = `${Math.round(state.flood)}%`;
+      floodFill.style.width = `${Math.min(100, state.flood)}%`;
+    }
+
+    function drawRoundedRect(c, x, y, w, h, r) {
+      c.beginPath();
+      c.roundRect(x, y, w, h, r);
+      c.fill();
+    }
+
+    function drawTile(c, x, y, size, cell) {
+      const pad = Math.max(2, size * .08);
+      c.fillStyle = cell.color;
+      drawRoundedRect(c, x + pad, y + pad, size - pad * 2, size - pad * 2, size * .16);
+      const gloss = c.createLinearGradient(x, y, x, y + size);
+      gloss.addColorStop(0, 'rgba(255,255,255,.38)');
+      gloss.addColorStop(.45, 'rgba(255,255,255,.05)');
+      gloss.addColorStop(1, 'rgba(0,0,0,.2)');
+      c.fillStyle = gloss;
+      drawRoundedRect(c, x + pad, y + pad, size - pad * 2, size - pad * 2, size * .16);
+      c.font = `${Math.floor(size * .52)}px serif`;
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText(cell.icon, x + size / 2, y + size / 2 + 1);
+    }
+
+    function drawBackground() {
+      const w = canvas.width, h = canvas.height;
+      const grd = ctx.createLinearGradient(0, 0, 0, h);
+      const storm = Math.min(1, state.day / 40);
+      grd.addColorStop(0, `rgb(${10 - storm*4}, ${35 - storm*15}, ${65 - storm*20})`);
+      grd.addColorStop(1, '#06111f');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(255,230,173,.08)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= COLS; x++) { ctx.beginPath(); ctx.moveTo(x * state.cell, 0); ctx.lineTo(x * state.cell, h); ctx.stroke(); }
+      for (let y = 0; y <= ROWS; y++) { ctx.beginPath(); ctx.moveTo(0, y * state.cell); ctx.lineTo(w, y * state.cell); ctx.stroke(); }
+
+      const waterH = h * (state.day / 40) * .42 + h * (state.flood / 100) * .18;
+      ctx.fillStyle = 'rgba(54, 179, 239, .32)';
+      ctx.beginPath();
+      const top = h - waterH;
+      ctx.moveTo(0, h);
+      for (let x = 0; x <= w; x += 12) ctx.lineTo(x, top + Math.sin((performance.now()/260) + x / 22) * 4);
+      ctx.lineTo(w, h); ctx.closePath(); ctx.fill();
+    }
+
+    function drawRain() {
+      const intensity = Math.max(8, state.day * 2.2);
+      while (state.rain.length < intensity) state.rain.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, l: 8 + Math.random() * 18 });
+      ctx.strokeStyle = `rgba(150, 213, 255, ${Math.min(.62, .16 + state.day/90)})`;
+      ctx.lineWidth = 1.2;
+      for (const r of state.rain) {
+        ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x - 5, r.y + r.l); ctx.stroke();
+        r.y += 5 + state.day / 7; r.x -= 1.2;
+        if (r.y > canvas.height) { r.y = -20; r.x = Math.random() * canvas.width; }
+      }
+    }
+
+    function drawBoard() {
+      drawBackground();
+      drawRain();
+      for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (state.board[y][x]) drawTile(ctx, x * state.cell, y * state.cell, state.cell, state.board[y][x]);
+      if (state.current) drawPiece(ctx, state.current, state.cell);
+      for (const flash of state.flashes) {
+        ctx.fillStyle = `rgba(255, 240, 180, ${flash.t / 220 * .55})`;
+        ctx.fillRect(0, flash.y * state.cell, canvas.width, state.cell);
+      }
+      if (state.won) drawRainbow(ctx, canvas.width, canvas.height);
+    }
+
+    function drawPiece(c, piece, size) {
+      for (let y = 0; y < piece.shape.length; y++) for (let x = 0; x < piece.shape[y].length; x++) {
+        if (piece.shape[y][x] && piece.y + y >= 0) drawTile(c, (piece.x + x) * size, (piece.y + y) * size, size, piece);
+      }
+    }
+
+    function drawNext() {
+      nctx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+      nctx.fillStyle = 'rgba(8,20,39,.9)'; nctx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+      if (!state.next) return;
+      const size = 30, shape = state.next.shape;
+      const ox = (nextCanvas.width - shape[0].length * size) / 2;
+      const oy = (nextCanvas.height - shape.length * size) / 2;
+      for (let y = 0; y < shape.length; y++) for (let x = 0; x < shape[y].length; x++) if (shape[y][x]) drawTile(nctx, ox + x * size, oy + y * size, size, state.next);
+    }
+
+    function drawRainbow(c, w, h) {
+      const colors = ['#ef4444','#f97316','#facc15','#22c55e','#38bdf8','#6366f1','#a855f7'];
+      c.lineWidth = Math.max(8, state.cell * .24);
+      colors.forEach((color, i) => {
+        c.strokeStyle = color;
+        c.beginPath();
+        c.arc(w / 2, h * .9, w * .42 - i * c.lineWidth, Math.PI, 0);
+        c.stroke();
+      });
+    }
+
+    function render() { drawBoard(); drawNext(); updateUi(); }
+
+    function loop(time) {
+      if (!state.running || state.paused) return;
+      const dt = Math.min(50, time - state.lastTime);
+      state.lastTime = time;
+      state.dropTimer += dt;
+      state.dayProgress += dt * 0.0032;
+      if (performance.now() > state.rainbowUntil) state.flood += dt * (0.0009 + state.day * 0.000045);
+      state.flashes.forEach(f => f.t -= dt);
+      state.flashes = state.flashes.filter(f => f.t > 0);
+      advanceDays();
+      if (state.dropTimer > dropInterval()) { state.dropTimer = 0; softDrop(); }
+      if (!state.over && !state.won) { render(); requestAnimationFrame(loop); }
+    }
+
+    function resizeBoard() {
+      const narrow = window.innerWidth < 620;
+      const reservedUiHeight = narrow ? 230 : (window.innerWidth < 860 ? 130 : 70);
+      const maxBoardWidth = Math.min(window.innerWidth * (narrow ? .92 : .45), 420);
+      const maxBoardHeight = Math.max(240, window.innerHeight - reservedUiHeight);
+      state.cell = Math.max(12, Math.floor(Math.min(maxBoardWidth / COLS, maxBoardHeight / ROWS)));
+      canvas.width = state.cell * COLS;
+      canvas.height = state.cell * ROWS;
+      render();
+    }
+
+    function handleAction(action) {
+      if (action === 'left') move(-1);
+      if (action === 'right') move(1);
+      if (action === 'rotate') rotate();
+      if (action === 'soft') softDrop();
+      if (action === 'drop') hardDrop();
+      render();
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(event.code)) event.preventDefault();
+      if (event.code === 'ArrowLeft') handleAction('left');
+      if (event.code === 'ArrowRight') handleAction('right');
+      if (event.code === 'ArrowUp') handleAction('rotate');
+      if (event.code === 'ArrowDown') handleAction('soft');
+      if (event.code === 'Space') handleAction('drop');
+      if (event.key.toLowerCase() === 'p') togglePause();
+      if (event.key.toLowerCase() === 'r') resetGame();
     });
 
-    startButton.addEventListener('click', startGame);
-    window.addEventListener('resize', moveTarget);
-    moveTarget();
+    document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', () => handleAction(btn.dataset.action)));
+    startBtn.addEventListener('click', resetGame);
+    overlayButton.addEventListener('click', () => state.paused ? togglePause() : resetGame());
+    pauseBtn.addEventListener('click', togglePause);
+    window.addEventListener('resize', resizeBoard);
+    window.addEventListener('orientationchange', resizeBoard);
+    new ResizeObserver(resizeBoard).observe(document.querySelector('.app'));
+
+    resizeBoard();
+    showVerse('start', 4200);
   </script>
 </body>
+</html>
